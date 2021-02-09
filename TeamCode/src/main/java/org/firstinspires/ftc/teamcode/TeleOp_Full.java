@@ -90,7 +90,7 @@ public class TeleOp_Full extends LinearOpMode {
                 ringArmPosition = .51;
             }
             else if(gamepad2.x){
-                //arm kicker boots it
+                ringArmPosition = .54;
             }
             else if(gamepad2.left_bumper){
                 while(gamepad2.left_bumper);

@@ -68,19 +68,12 @@ public class TeleOp_HighSpeed extends LinearOpMode {
 
             drive.setDriveSpeed(frontRightDrive,backRightDrive,frontLeftDrive,backLeftDrive);
 
-            if (gamepad1.x) {
-                arm.grabFD();
-            }
-            else if (gamepad1.y){
-                arm.releaseFD();
-            }
 
             //////////////////////////////////   GAMEPAD 2   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
             throttle2 = Math.max(1 - gamepad2.left_trigger,.5);
 
             rotate = -gamepad2.left_stick_y * throttle2;
-            arm.setAngleSpeed(rotate);
             extend = -gamepad2.right_stick_y * throttle2;
             arm.setExtendSpeed(extend);
 

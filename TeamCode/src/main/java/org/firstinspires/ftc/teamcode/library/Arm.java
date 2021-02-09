@@ -10,18 +10,12 @@ public interface Arm{
 
 
     //void Arm(HardwareMap HardwareMap);
-    void armAngle (double armAngle, LinearOpMode linarOpMode);
-    void setAngleSpeed (double Power);
     void setExtendSpeed (double Power);
     void setExtendPosition (int targetPosition );
     void grip();
     void release();
-    void setGripPosition (double targetPosition);
 
-    void grabFD();
-    void releaseFD();
-
-
+    void ringGrabberPosition(double position);
 
 
 

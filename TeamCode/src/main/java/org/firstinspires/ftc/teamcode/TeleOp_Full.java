@@ -21,7 +21,7 @@ public class TeleOp_Full extends LinearOpMode {
 	Arm arm;
 
     double frontLeftDrive, frontRightDrive, backRightDrive, backLeftDrive;
-    double rotate, extend;
+    double extend;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,7 +29,8 @@ public class TeleOp_Full extends LinearOpMode {
         telemetry.addLine("Initialising... please wait.");
         telemetry.update();
 
-        double throtle, throttle2;
+        double throtle;
+        double ringArmPosition = 0;
 
         drive = new DriveImpl();
 
@@ -46,6 +47,8 @@ public class TeleOp_Full extends LinearOpMode {
 
         waitForStart();
 
+        arm.ringGrabberPosition(ringArmPosition);
+
         while (opModeIsActive()) {
 
             ///GAMEPAD 1
@@ -59,32 +62,45 @@ public class TeleOp_Full extends LinearOpMode {
              * not multiplied by the throttle, because it is used for sliding sideways and can not be controlled
              * efficiently with the throttle due to the high power requirements of sliding.
              */
-            frontRightDrive = (gamepad1.right_stick_y * throtle) + (gamepad1.right_stick_x * throtle) + (gamepad1.left_stick_x * throtle);
-            frontLeftDrive  = (gamepad1.right_stick_y * throtle) - (gamepad1.right_stick_x * throtle) - (gamepad1.left_stick_x * throtle);
-            backRightDrive  = (gamepad1.right_stick_y * throtle) + (gamepad1.right_stick_x * throtle) - (gamepad1.left_stick_x * throtle);
-            backLeftDrive   = (gamepad1.right_stick_y * throtle) - (gamepad1.right_stick_x * throtle) + (gamepad1.left_stick_x * throtle);
-
+            frontRightDrive = (gamepad1.left_stick_y * throtle) + (gamepad1.left_stick_x * throtle) + (gamepad1.right_stick_x * throtle);
+            frontLeftDrive  = (gamepad1.left_stick_y * throtle) - (gamepad1.left_stick_x * throtle) - (gamepad1.right_stick_x * throtle);
+            backRightDrive  = (gamepad1.left_stick_y * throtle) + (gamepad1.left_stick_x * throtle) - (gamepad1.right_stick_x * throtle);
+            backLeftDrive   = (gamepad1.left_stick_y * throtle) - (gamepad1.left_stick_x * throtle) + (gamepad1.right_stick_x * throtle);
             drive.setDriveSpeed(frontRightDrive,backRightDrive,frontLeftDrive,backLeftDrive);
 
-            if (gamepad1.x) {
-                arm.grabFD();
-            }
-            else if (gamepad1.y){
-                arm.releaseFD();
-            }
+
 
             //GAMEPAD 2
-
-            throttle2 = Math.max(gamepad2.left_trigger,.5);
-
-            rotate = -gamepad2.left_stick_y * throttle2;
-            arm.setAngleSpeed(rotate);
-            extend = -gamepad2.right_stick_y * throttle2;
+            extend = gamepad2.right_stick_y * 0.5;
             arm.setExtendSpeed(extend);
 
-            if(gamepad2.left_bumper) arm.grip();
-            else if (gamepad2.right_bumper) arm.release();
+            double gp2lt = gamepad2.left_trigger;
+            double gp2rt = gamepad2.right_trigger;
+            if(gp2lt > .5f) arm.grip();
+            else if (gp2rt > .5f) arm.release();
 
+
+            if(gamepad2.y){
+                ringArmPosition = 0;
+            }
+            else if(gamepad2.a){
+                ringArmPosition = 1;
+            }
+            else if(gamepad2.b){
+                ringArmPosition = .51;
+            }
+            else if(gamepad2.x){
+                //arm kicker boots it
+            }
+            else if(gamepad2.left_bumper){
+                while(gamepad2.left_bumper);
+                ringArmPosition -= .01;
+            }
+            else if(gamepad2.right_bumper){
+                while(gamepad2.right_bumper);
+                ringArmPosition += .01;
+            }
+            arm.ringGrabberPosition(ringArmPosition);
 
             //TELEMETRY
 
@@ -94,8 +110,10 @@ public class TeleOp_Full extends LinearOpMode {
             telemetry.addData("Back left drive speed   = ", "%1.2f", backLeftDrive);
 	        telemetry.addData("Throttle                = ", "%1.2f", throtle);
 	        telemetry.addLine();
-            telemetry.addData("angle speed = ", "%1.2f", rotate);
             telemetry.addData("extend speed  = ", "%1.2f", extend);
+            telemetry.addData(" GP2 LT = ", "%1.2f", gp2lt);
+            telemetry.addData(" GP2 RT = ", "%1.2f", gp2rt);
+            telemetry.addData(" Ring Arm = ", "%1.2f", ringArmPosition);
             telemetry.update();
         }
     }
